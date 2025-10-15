@@ -402,10 +402,7 @@
                 try {
                     const saved = localStorage.getItem(getStorageKey('farm-tracker'));
                     const parsedProjects = saved ? JSON.parse(saved) : [];
-                    return parsedProjects.map(p => ({
-                        ...p,
-                        details: p.details || { notes: '', website: '', twitter: '' }
-                    }));
+                    return parsedProjects.map(p => ({ ...p, details: p.details || { notes: '', website: '', twitter: '' } }));
                 } catch (error) { return []; }
             });
 
@@ -415,10 +412,9 @@
             React.useEffect(() => {
                 localStorage.setItem(getStorageKey('farm-tracker'), JSON.stringify(projects));
             }, [projects, getStorageKey]);
-
-            React.useEffect(() => {
-                // Notification logic...
-            }, [projects, getStorageKey]);
+            
+            // Notification logic...
+            React.useEffect(() => { /* unchanged */ }, [projects, getStorageKey]);
 
             const addProject = (e) => {
                 e.preventDefault();
@@ -431,17 +427,35 @@
                 setNewProjectName('');
             };
             
-            const exportData = () => { /* ... */ };
-            const importData = (event) => { /* ... */ };
+            const exportData = () => {
+                const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(projects, null, 2))}`;
+                const link = document.createElement("a");
+                link.href = jsonString;
+                link.download = `basetask_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                link.click();
+            };
+            const importData = (event) => {
+                 const fileReader = new FileReader();
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = e => {
+                    try {
+                        const importedProjects = JSON.parse(e.target.result);
+                        if (Array.isArray(importedProjects)) {
+                             const migratedProjects = importedProjects.map(p => ({
+                                ...p,
+                                details: p.details || { notes: '', website: '', twitter: '' }
+                            }));
+                            setProjects(migratedProjects);
+                            showNotification("Data imported successfully!", "success");
+                        } else { throw new Error("Invalid file format"); }
+                    } catch (error) { showNotification("Failed to import data. Invalid file.", "error"); }
+                };
+                 event.target.value = null;
+            };
 
             const sortedProjects = React.useMemo(() => {
                 const projectsCopy = [...projects];
-                const getPriorityScore = (priority) => {
-                    if (priority === 'high') return 3;
-                    if (priority === 'medium') return 2;
-                    if (priority === 'low') return 1;
-                    return 0;
-                };
+                const getPriorityScore = (priority) => ({ high: 3, medium: 2, low: 1 }[priority] || 0);
                 switch (sortMethod) {
                     case 'alphabetical': return projectsCopy.sort((a, b) => a.name.localeCompare(b.name));
                     case 'progress':
@@ -489,11 +503,10 @@
                         </button>
                     </form>
                     
-                    {sortedProjects.length > 0 ? sortedProjects.map(project => (
+                    {sortedProjects.map(project => (
                         <ProjectCard key={project.id} project={project} setProjects={setProjects} allProjects={projects} />
-                    )) : (
-                         <p style={{textAlign: 'center', color: 'var(--subtle-text-color)'}}>No projects yet. Add one to start tracking!</p>
-                    )}
+                    ))}
+                    {sortedProjects.length === 0 && <p style={{textAlign: 'center', color: 'var(--subtle-text-color)'}}>No projects yet. Add one to start tracking!</p>}
                 </div>
             );
         }
@@ -508,12 +521,8 @@
             const updateProject = (updatedData) => {
                 setProjects(allProjects.map(p => p.id === project.id ? {...p, ...updatedData} : p));
             };
-
-            const deleteProject = () => { /* ... */ };
-            const handleTaskInputChange = (field, value) => {
-                setNewTaskInputs(prev => ({...prev, [field]: value }));
-            };
-
+            const deleteProject = () => { if (confirm('...')) { setProjects(allProjects.filter(p => p.id !== project.id)); } };
+            const handleTaskInputChange = (field, value) => setNewTaskInputs(prev => ({...prev, [field]: value }));
             const addTask = (e) => {
                 e.preventDefault();
                 const text = newTaskInputs.text || '';
@@ -522,21 +531,63 @@
                 updateProject({ tasks: [...project.tasks, newTask] });
                 setNewTaskInputs({ text: '', dueDate: '', priority: 'medium' });
             };
-
-            const handleDetailChange = (field, value) => { /* ... */ };
-            const toggleTask = (taskId) => { /* ... */ };
-            const handleEdit = (task) => { /* ... */ };
-            const saveEdit = (taskId) => { /* ... */ };
-            const formatDate = (dateString) => { /* ... */ };
-            const getDueDateClass = (task) => { /* ... */ };
+            const handleDetailChange = (field, value) => {
+                updateProject({ details: { ...project.details, [field]: value } });
+            };
+            const toggleTask = (taskId) => {
+                updateProject({ tasks: project.tasks.map(t => t.id === taskId ? { ...t, completed: !t.completed } : t) });
+            };
+            const handleEdit = (task) => { setEditingTaskId(task.id); setEditingText(task.text); };
+            const saveEdit = (taskId) => {
+                updateProject({ tasks: project.tasks.map(t => t.id === taskId ? { ...t, text: editingText } : t) });
+                setEditingTaskId(null); setEditingText('');
+            };
+            const formatDate = (dateString) => {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+                return new Date(date.getTime() + userTimezoneOffset).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            };
+            const getDueDateClass = (task) => {
+                if (!task.dueDate || task.completed) return '';
+                const today = new Date(); today.setHours(0,0,0,0);
+                const dueDate = new Date(task.dueDate); dueDate.setHours(0,0,0,0);
+                if (dueDate < today) return 'overdue';
+                if (dueDate.getTime() === today.getTime()) return 'today';
+                return '';
+            };
 
             const incompleteTasks = project.tasks.filter(t => !t.completed);
             const completedTasks = project.tasks.filter(t => t.completed);
             const progress = project.tasks.length > 0 ? (completedTasks.length / project.tasks.length) * 100 : 0;
-           
             const PriorityTag = ({priority}) => (<span className={`priority-tag ${priority}`}>{priority}</span>);
 
-            const TaskItem = ({ task }) => { /* ... */ };
+            const TaskItem = ({ task }) => {
+                const isEditing = editingTaskId === task.id;
+                return (
+                    <li className="task-item">
+                        {isEditing ? (
+                            <form className="edit-task-form" onSubmit={(e) => { e.preventDefault(); saveEdit(task.id); }}>
+                                <input type="text" value={editingText} onChange={(e) => setEditingText(e.target.value)} autoFocus onBlur={() => saveEdit(task.id)}/>
+                            </form>
+                        ) : (
+                            <>
+                                <div className="task-item-main">
+                                    <input type="checkbox" id={`task-${task.id}`} checked={task.completed} onChange={() => toggleTask(task.id)} />
+                                    <label htmlFor={`task-${task.id}`} className={task.completed ? 'completed' : ''}> {task.text} </label>
+                                </div>
+                                <div className="task-item-actions">
+                                    <PriorityTag priority={task.priority} />
+                                    {task.dueDate && <span className={`task-due-date ${getDueDateClass(task)}`}> {formatDate(task.dueDate)} </span>}
+                                    <button className="action-button edit" onClick={() => handleEdit(task)}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </li>
+                );
+            };
 
             return (
                  <div className="project-card">
@@ -547,14 +598,19 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                             </button>
                         </div>
-                        {project.tasks.length > 0 && ( /* Progress bar ... */ )}
+                        {project.tasks.length > 0 && (
+                            <div className="progress-info">
+                                <div className="progress-text">{completedTasks.length} of {project.tasks.length} tasks completed</div>
+                                <div className="progress-bar-container"><div className="progress-bar" style={{width: `${progress}%`}}></div></div>
+                            </div>
+                        )}
                         <ul className="task-list">
                             {incompleteTasks.map(task => (<TaskItem key={task.id} task={task} />))}
                         </ul>
                         <form className="task-form" onSubmit={addTask}>
-                            <input type="text" placeholder="Add new task (e.g., Swap to increase volume)" value={newTaskInputs.text} onChange={(e) => handleTaskInputChange('text', e.target.value)} />
-                            <input type="date" value={newTaskInputs.dueDate} onChange={(e) => handleTaskInputChange('dueDate', e.target.value)} />
-                            <select value={newTaskInputs.priority} onChange={(e) => handleTaskInputChange('priority', e.target.value)}>
+                            <input type="text" placeholder="Add new task (e.g., Swap to increase volume)" value={newTaskInputs.text || ''} onChange={(e) => handleTaskInputChange('text', e.target.value)} />
+                            <input type="date" value={newTaskInputs.dueDate || ''} onChange={(e) => handleTaskInputChange('dueDate', e.target.value)} />
+                            <select value={newTaskInputs.priority || 'medium'} onChange={(e) => handleTaskInputChange('priority', e.target.value)}>
                                 <option value="low">Low</option>
                                 <option value="medium">Medium</option>
                                 <option value="high">High</option>
@@ -564,9 +620,40 @@
                                 Add
                             </button>
                         </form>
-                         {completedTasks.length > 0 && ( /* Completed tasks section ... */ )}
+                         {completedTasks.length > 0 && (
+                            <>
+                                <button className={`completed-section-toggle ${completedVisible ? 'open' : ''}`} onClick={() => setCompletedVisible(prev => !prev)}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    {completedTasks.length} Completed Tasks
+                                </button>
+                                <div className={`completed-list ${completedVisible ? 'open' : ''}`}>
+                                    <ul className="task-list">
+                                        {completedTasks.map(task => (<TaskItem key={task.id} task={task} />))}
+                                    </ul>
+                                </div>
+                            </>
+                        )}
                     </div>
-                    {/* Details section ... */}
+                    <button className={`details-toggle ${detailsVisible ? 'open' : ''}`} onClick={() => setDetailsVisible(prev => !prev)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        Details
+                    </button>
+                    <div className={`project-details ${detailsVisible ? 'open' : ''}`}>
+                        <div className="details-grid">
+                            <div>
+                                <label>Website</label>
+                                <input type="text" placeholder="https://project.com" value={project.details?.website || ''} onChange={(e) => handleDetailChange('website', e.target.value)} />
+                            </div>
+                            <div>
+                                <label>Twitter</label>
+                                <input type="text" placeholder="https://twitter.com/project" value={project.details?.twitter || ''} onChange={(e) => handleDetailChange('twitter', e.target.value)} />
+                            </div>
+                            <div style={{gridColumn: '1 / -1'}}>
+                                <label>Notes</label>
+                                <textarea placeholder="Your strategy, thoughts, next steps..." value={project.details?.notes || ''} onChange={(e) => handleDetailChange('notes', e.target.value)}></textarea>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             );
         }
