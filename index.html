@@ -262,7 +262,18 @@
                 }
             };
 
-            const disconnectWallet = () => {
+            const disconnectWallet = async () => {
+                if (window.ethereum && window.ethereum.request) {
+                    try {
+                        // Ask MetaMask to revoke permissions for this site.
+                        await window.ethereum.request({
+                            method: 'wallet_revokePermissions',
+                            params: [{ eth_accounts: {} }],
+                        });
+                    } catch (err) {
+                        console.error("Could not revoke wallet permissions:", err);
+                    }
+                }
                 setUserAddress(null);
                 showNotification("Wallet Disconnected.", "success");
             };
@@ -411,6 +422,18 @@
                 return '';
             };
 
+            const formatDate = (dateString) => {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                // Add timezone offset to prevent date from showing as previous day
+                const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+                return new Date(date.getTime() + userTimezoneOffset).toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+            };
+
             return (
                 <div>
                     <form className="project-form" onSubmit={addProject}>
@@ -463,7 +486,7 @@
                                             </div>
                                             {task.dueDate && (
                                                 <span className={`task-due-date ${getDueDateClass(task)}`}>
-                                                    {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                    {formatDate(task.dueDate)}
                                                 </span>
                                             )}
                                         </li>
