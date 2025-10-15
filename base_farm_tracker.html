@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BaseFarm Tracker - Airdrop Checklist</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        :root {
+            --primary-color: #0052ff;
+            --success-color: #28a745;
+            --danger-color: #e53e3e;
+            --today-color: #0052ff;
+            
+            --background-color: #f0f4f8;
+            --card-background: #ffffff;
+            --card-secondary-bg: #f8fafc;
+            --text-color: #1a202c;
+            --subtle-text-color: #4a5568;
+            --border-color: #e2e8f0;
+            --hover-color: #eff6ff;
+        }
+
+        body.dark {
+            --background-color: #111827;
+            --card-background: #1f2937;
+            --card-secondary-bg: #374151;
+            --text-color: #f9fafb;
+            --subtle-text-color: #9ca3af;
+            --border-color: #4b5563;
+            --hover-color: #374151;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 1rem;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        #root {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--card-background);
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            padding: 2rem;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+        }
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .header-left {
+             display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .app-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .theme-toggle-button {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--subtle-text-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .theme-toggle-button:hover {
+            background-color: var(--card-secondary-bg);
+            color: var(--text-color);
+        }
+        .connectButton {
+            background-color: var(--primary-color); color: white; border: none; padding: 0.75rem 1.25rem;
+            border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .connectButton:hover { background-color: #0045d1; }
+        .connectButton:disabled { background-color: #a0aec0; cursor: not-allowed; }
+
+        .project-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        .project-form input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--card-background);
+            color: var(--text-color);
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        .project-form button {
+            background-color: var(--primary-color); color: white; border: none;
+            padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .project-form button:hover { background-color: #0045d1; }
+
+        .project-card {
+            background-color: var(--card-secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .project-header h2 { margin: 0; font-size: 1.2rem; }
+        .delete-button {
+            background: none; border: none; cursor: pointer; color: var(--subtle-text-color);
+            transition: color 0.2s; padding: 0.25rem;
+        }
+        .delete-button:hover { color: var(--danger-color); }
+        
+        .progress-info { margin-bottom: 1rem; }
+        .progress-text { font-size: 0.8rem; color: var(--subtle-text-color); margin-bottom: 0.25rem; }
+        .progress-bar-container { width: 100%; background-color: var(--border-color); border-radius: 99px; height: 8px; overflow: hidden; transition: background-color 0.3s ease; }
+        .progress-bar { height: 100%; background-color: var(--primary-color); border-radius: 99px; transition: width 0.5s ease; }
+
+        .task-list { list-style: none; padding: 0; margin: 0; }
+        .task-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0.5rem; flex-wrap: wrap; border-radius: 8px; transition: background-color 0.2s ease;}
+        .task-item:hover { background-color: var(--hover-color); }
+        .task-item-main { display: flex; align-items: center; flex-grow: 1; gap: 0.75rem; }
+        .task-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
+        .task-item label { flex-grow: 1; cursor: pointer; }
+        .task-item label.completed { text-decoration: line-through; color: var(--subtle-text-color); }
+        .task-due-date {
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background-color: var(--border-color);
+            color: var(--subtle-text-color);
+            flex-shrink: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .task-due-date.overdue { background-color: #fed7d7; color: var(--danger-color); }
+        body.dark .task-due-date.overdue { background-color: #5c1b1b; color: #fca5a5; }
+        .task-due-date.today { background-color: #bee3f8; color: var(--today-color); }
+        body.dark .task-due-date.today { background-color: #1e40af; color: #93c5fd; }
+        
+        .task-form { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+        .task-form input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background-color: var(--card-background);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        .task-form input[type="text"] {
+            flex-grow: 1;
+            min-width: 200px;
+        }
+        .task-form button {
+            background-color: var(--success-color); color: white; border: none;
+            padding: 0.5rem 1rem; border-radius: 6px; font-weight: 500; cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex; align-items: center; gap: 0.25rem;
+        }
+        .task-form button:hover { background-color: #218838; }
+
+        .notification {
+            padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px; font-weight: 500; text-align: center;
+        }
+        .notification.success { background-color: #e9f7ec; color: #155724; }
+        .notification.error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.6.umd.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        function App() {
+            const [userAddress, setUserAddress] = React.useState(null);
+            const [notification, setNotification] = React.useState({ message: '', type: '' });
+            const [theme, setTheme] = React.useState(() => localStorage.getItem('theme') || 'light');
+
+            React.useEffect(() => {
+                document.body.className = theme;
+                localStorage.setItem('theme', theme);
+            }, [theme]);
+            
+            React.useEffect(() => {
+                if ("Notification" in window && Notification.permission !== "granted") {
+                    Notification.requestPermission();
+                }
+            }, []);
+
+            const toggleTheme = () => {
+                setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+            };
+
+            const showNotification = (message, type = 'info') => {
+                setNotification({ message, type });
+                setTimeout(() => setNotification({ message: '', type: '' }), 4000);
+            };
+
+            const connectWallet = async () => {
+                if (!window.ethereum) return showNotification("Please install MetaMask!", "error");
+                try {
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    const signer = provider.getSigner();
+                    const address = await signer.getAddress();
+                    setUserAddress(address);
+                    showNotification("Wallet Connected! Your tracker is unlocked.", "success");
+                } catch (err) {
+                    console.error(err);
+                    showNotification("Failed to connect wallet.", "error");
+                }
+            };
+            
+            return (
+                <div className="app-container">
+                    <div className="app-header">
+                        <div className="header-left">
+                            <h1>BaseFarm Tracker</h1>
+                        </div>
+                        <div className="header-actions">
+                            <button 
+                                className="connectButton"
+                                onClick={connectWallet} 
+                                disabled={!!userAddress}
+                            >
+                                {userAddress 
+                                    ? `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`
+                                    : "Connect Wallet"}
+                            </button>
+                            <button className="theme-toggle-button" onClick={toggleTheme} aria-label="Toggle theme">
+                                {theme === 'light' ? 
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> :
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                                }
+                            </button>
+                        </div>
+                    </div>
+
+                    {notification.message && (
+                        <div className={`notification ${notification.type}`}>
+                            {notification.message}
+                        </div>
+                    )}
+                    
+                    {userAddress ? (
+                        <FarmTracker userAddress={userAddress} />
+                    ) : (
+                        <div style={{ textAlign: 'center', padding: '2rem' }}>
+                            <p>Please connect your wallet to manage your airdrop checklist.</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function FarmTracker({ userAddress }) {
+            const getStorageKey = () => `farm-tracker-${userAddress}`;
+            
+            const [projects, setProjects] = React.useState(() => {
+                try {
+                    const saved = localStorage.getItem(getStorageKey());
+                    return saved ? JSON.parse(saved) : [];
+                } catch (error) { return []; }
+            });
+
+            const [newProjectName, setNewProjectName] = React.useState('');
+            const [newTaskInputs, setNewTaskInputs] = React.useState({});
+
+            React.useEffect(() => {
+                localStorage.setItem(getStorageKey(), JSON.stringify(projects));
+            }, [projects, userAddress]);
+
+            React.useEffect(() => {
+                if (Notification.permission !== "granted") return;
+
+                const today = new Date();
+                today.setHours(0,0,0,0);
+
+                projects.forEach(project => {
+                    project.tasks.forEach(task => {
+                        if (!task.completed && task.dueDate) {
+                            const dueDate = new Date(task.dueDate);
+                            dueDate.setHours(0,0,0,0);
+                            if (dueDate.getTime() === today.getTime()) {
+                                new Notification(`Task Due: ${project.name}`, {
+                                    body: `You have a task due today: "${task.text}"`,
+                                    icon: "https://placehold.co/192x192/0052ff/FFFFFF?text=B",
+                                });
+                            }
+                        }
+                    });
+                });
+            }, [projects]);
+
+
+            const addProject = (e) => {
+                e.preventDefault();
+                if (!newProjectName.trim()) return;
+                const newProject = { id: Date.now(), name: newProjectName, tasks: [] };
+                setProjects([...projects, newProject]);
+                setNewProjectName('');
+            };
+
+            const deleteProject = (projectId) => {
+                if (confirm('Are you sure you want to delete this project and all its tasks?')) {
+                    setProjects(projects.filter(p => p.id !== projectId));
+                }
+            };
+
+            const addTask = (projectId) => {
+                const taskInput = newTaskInputs[projectId] || {};
+                const text = taskInput.text || '';
+                const dueDate = taskInput.dueDate || '';
+
+                if (!text.trim()) return;
+                const newTask = { id: Date.now(), text, dueDate, completed: false };
+                const updatedProjects = projects.map(p => 
+                    p.id === projectId ? { ...p, tasks: [...p.tasks, newTask] } : p
+                );
+                setProjects(updatedProjects);
+                setNewTaskInputs({...newTaskInputs, [projectId]: { text: '', dueDate: '' }});
+            };
+            
+            const toggleTask = (projectId, taskId) => {
+                const updatedProjects = projects.map(p => {
+                    if (p.id === projectId) {
+                        const updatedTasks = p.tasks.map(t => 
+                            t.id === taskId ? { ...t, completed: !t.completed } : t
+                        );
+                        return { ...p, tasks: updatedTasks };
+                    }
+                    return p;
+                });
+                setProjects(updatedProjects);
+            };
+
+            const handleTaskInputChange = (projectId, field, value) => {
+                 setNewTaskInputs(prev => ({
+                     ...prev,
+                     [projectId]: {
+                         ...prev[projectId],
+                         [field]: value
+                     }
+                 }));
+            };
+
+            const getDueDateClass = (task) => {
+                if (!task.dueDate || task.completed) return '';
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const dueDate = new Date(task.dueDate);
+                dueDate.setHours(0,0,0,0);
+                
+                if (dueDate < today) return 'overdue';
+                if (dueDate.getTime() === today.getTime()) return 'today';
+                return '';
+            };
+
+            return (
+                <div>
+                    <form className="project-form" onSubmit={addProject}>
+                        <input 
+                            type="text" 
+                            placeholder="Add new project (e.g., LayerZero)"
+                            value={newProjectName}
+                            onChange={(e) => setNewProjectName(e.target.value)}
+                        />
+                        <button type="submit">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Add Project
+                        </button>
+                    </form>
+
+                    {projects.length > 0 ? projects.map(project => {
+                        const totalTasks = project.tasks.length;
+                        const completedTasks = project.tasks.filter(t => t.completed).length;
+                        const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+                        return (
+                            <div key={project.id} className="project-card">
+                                <div className="project-header">
+                                    <h2>{project.name}</h2>
+                                    <button className="delete-button" onClick={() => deleteProject(project.id)}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
+                                </div>
+                                {totalTasks > 0 && (
+                                    <div className="progress-info">
+                                        <div className="progress-text">{completedTasks} of {totalTasks} tasks completed</div>
+                                        <div className="progress-bar-container">
+                                            <div className="progress-bar" style={{width: `${progress}%`}}></div>
+                                        </div>
+                                    </div>
+                                )}
+                                <ul className="task-list">
+                                    {project.tasks.map(task => (
+                                        <li key={task.id} className="task-item">
+                                            <div className="task-item-main">
+                                                <input 
+                                                    type="checkbox" 
+                                                    id={`task-${task.id}`}
+                                                    checked={task.completed}
+                                                    onChange={() => toggleTask(project.id, task.id)}
+                                                />
+                                                <label htmlFor={`task-${task.id}`} className={task.completed ? 'completed' : ''}>
+                                                    {task.text}
+                                                </label>
+                                            </div>
+                                            {task.dueDate && (
+                                                <span className={`task-due-date ${getDueDateClass(task)}`}>
+                                                    {new Date(task.dueDate).toLocaleDateString()}
+                                                </span>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                                <form className="task-form" onSubmit={(e) => { e.preventDefault(); addTask(project.id); }}>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Add new task..."
+                                        value={(newTaskInputs[project.id] || {}).text || ''}
+                                        onChange={(e) => handleTaskInputChange(project.id, 'text', e.target.value)}
+                                    />
+                                    <input 
+                                        type="date"
+                                        value={(newTaskInputs[project.id] || {}).dueDate || ''}
+                                        onChange={(e) => handleTaskInputChange(project.id, 'dueDate', e.target.value)}
+                                    />
+                                    <button type="submit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        Add
+                                    </button>
+                                </form>
+                            </div>
+                        )
+                    }) : (
+                         <p style={{textAlign: 'center', color: 'var(--subtle-text-color)'}}>No projects yet. Add one to start tracking!</p>
+                    )}
+                </div>
+            );
+        }
+        
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
+
