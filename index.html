@@ -85,7 +85,7 @@
             align-items: center;
             gap: 1rem;
         }
-        .theme-toggle-button {
+        .icon-button {
             background: none;
             border: 1px solid var(--border-color);
             color: var(--subtle-text-color);
@@ -98,7 +98,7 @@
             justify-content: center;
             transition: background-color 0.2s, color 0.2s;
         }
-        .theme-toggle-button:hover {
+        .icon-button:hover {
             background-color: var(--card-secondary-bg);
             color: var(--text-color);
         }
@@ -111,7 +111,8 @@
         .connectButton.disconnect { background-color: var(--subtle-text-color); }
         .connectButton.disconnect:hover { background-color: var(--danger-color); }
 
-        .project-form { display: flex; gap: 0.5rem; margin-bottom: 2rem; }
+        .controls-section { display: flex; gap: 1rem; margin-bottom: 2rem; align-items: stretch; }
+        .project-form { display: flex; gap: 0.5rem; flex-grow: 1; }
         .project-form input {
             flex-grow: 1; padding: 0.75rem 1rem; border: 1px solid var(--border-color);
             border-radius: 8px; font-size: 1rem; background-color: var(--card-background);
@@ -119,16 +120,22 @@
         }
         .project-form button {
             background-color: var(--primary-color); color: white; border: none;
-            padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer;
+            padding: 0 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer;
             transition: background-color 0.3s ease; display: flex; align-items: center; gap: 0.5rem;
         }
         .project-form button:hover { background-color: #0045d1; }
+        .sort-control select {
+            height: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);
+            background-color: var(--card-background); color: var(--text-color); font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+        }
 
         .project-card {
             background-color: var(--card-secondary-bg); border: 1px solid var(--border-color);
-            border-radius: 12px; margin-bottom: 1.5rem; padding: 1.5rem;
+            border-radius: 12px; margin-bottom: 1.5rem;
             transition: background-color 0.3s, border-color 0.3s;
         }
+        .project-card-main { padding: 1.5rem; }
         .project-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
         .project-header h2 { margin: 0; font-size: 1.2rem; }
         .action-button { background: none; border: none; cursor: pointer; color: var(--subtle-text-color); transition: color 0.2s; padding: 0.25rem; }
@@ -139,6 +146,28 @@
         .progress-text { font-size: 0.8rem; color: var(--subtle-text-color); margin-bottom: 0.25rem; }
         .progress-bar-container { width: 100%; background-color: var(--border-color); border-radius: 99px; height: 8px; overflow: hidden; transition: background-color 0.3s ease; }
         .progress-bar { height: 100%; background-color: var(--primary-color); border-radius: 99px; transition: width 0.5s ease; }
+        
+        .details-toggle {
+            background: none; border: none; width: 100%; text-align: left; padding: 0.5rem 1.5rem;
+            border-top: 1px solid var(--border-color); color: var(--subtle-text-color); cursor: pointer;
+            display: flex; align-items: center; gap: 0.25rem; font-weight: 500;
+        }
+        .details-toggle svg { transition: transform 0.3s ease; }
+        .details-toggle.open svg { transform: rotate(90deg); }
+        .project-details {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            overflow: hidden; max-height: 0; transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+        }
+        .project-details.open { max-height: 1000px; }
+        .details-grid { display: grid; gap: 1rem; }
+        .details-grid label { font-size: 0.8rem; font-weight: 500; color: var(--subtle-text-color); margin-bottom: 0.25rem; display: block; }
+        .details-grid input, .details-grid textarea {
+            width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;
+            font-size: 0.9rem; background-color: var(--card-background); color: var(--text-color);
+            font-family: 'Inter', sans-serif; box-sizing: border-box;
+        }
+        .details-grid textarea { min-height: 80px; resize: vertical; }
+
 
         .task-list { list-style: none; padding: 0; margin: 0; }
         .task-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0.5rem; flex-wrap: wrap; border-radius: 8px; transition: background-color 0.2s ease;}
@@ -276,7 +305,7 @@
                                     ? "Disconnect"
                                     : "Connect Wallet"}
                             </button>
-                            <button className="theme-toggle-button" onClick={toggleTheme} aria-label="Toggle theme">
+                            <button className="icon-button" onClick={toggleTheme} aria-label="Toggle theme">
                                 {theme === 'light' ? 
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> :
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
@@ -292,7 +321,7 @@
                     )}
                     
                     {userAddress ? (
-                        <FarmTracker userAddress={userAddress} />
+                        <FarmTracker userAddress={userAddress} showNotification={showNotification}/>
                     ) : (
                         <div style={{ textAlign: 'center', padding: '2rem' }}>
                             <p>Please connect your wallet to manage your airdrop checklist.</p>
@@ -302,7 +331,7 @@
             );
         }
 
-        function FarmTracker({ userAddress }) {
+        function FarmTracker({ userAddress, showNotification }) {
             const getStorageKey = (key) => `${key}-${userAddress}`;
             
             const [projects, setProjects] = React.useState(() => {
@@ -317,6 +346,8 @@
             const [editingTaskId, setEditingTaskId] = React.useState(null);
             const [editingText, setEditingText] = React.useState('');
             const [completedVisible, setCompletedVisible] = React.useState({});
+            const [detailsVisible, setDetailsVisible] = React.useState({});
+            const [sortMethod, setSortMethod] = React.useState('dateAdded');
 
             React.useEffect(() => {
                 localStorage.setItem(getStorageKey('farm-tracker'), JSON.stringify(projects));
@@ -328,7 +359,6 @@
                 const today = new Date().toISOString().slice(0, 10);
                 const sentNotificationsKey = getStorageKey(`sent-notifications-${today}`);
                 let sentNotifications = JSON.parse(localStorage.getItem(sentNotificationsKey) || '[]');
-
                 const notificationsToSend = [];
 
                 projects.forEach(project => {
@@ -353,16 +383,21 @@
                     localStorage.setItem(sentNotificationsKey, JSON.stringify(sentNotifications));
                 }
             }, [projects, userAddress]);
-
-            const updateProject = (projectId, updatedProject) => {
-                setProjects(projects.map(p => p.id === projectId ? updatedProject : p));
+            
+            const updateProject = (projectId, updatedData) => {
+                setProjects(projects.map(p => p.id === projectId ? {...p, ...updatedData} : p));
             };
 
             const addProject = (e) => {
                 e.preventDefault();
                 if (!newProjectName.trim()) return;
-                const newProject = { id: Date.now(), name: newProjectName, tasks: [] };
-                setProjects([...projects, newProject]);
+                const newProject = { 
+                    id: Date.now(), 
+                    name: newProjectName, 
+                    tasks: [], 
+                    details: { notes: '', website: '', twitter: '' } 
+                };
+                setProjects([newProject, ...projects]);
                 setNewProjectName('');
             };
 
@@ -371,6 +406,10 @@
                     setProjects(projects.filter(p => p.id !== projectId));
                 }
             };
+            
+            const handleTaskInputChange = (projectId, field, value) => {
+                 setNewTaskInputs(prev => ({...prev, [projectId]: { ...prev[projectId], [field]: value }}));
+            };
 
             const addTask = (projectId) => {
                 const taskInput = newTaskInputs[projectId] || {};
@@ -378,24 +417,157 @@
                 if (!text.trim()) return;
 
                 const newTask = { 
-                    id: Date.now(), 
-                    text, 
-                    dueDate: taskInput.dueDate || '', 
-                    priority: taskInput.priority || 'medium',
+                    id: Date.now(), text, 
+                    dueDate: taskInput.dueDate || '', priority: taskInput.priority || 'medium',
                     completed: false 
                 };
                 
                 const project = projects.find(p => p.id === projectId);
-                updateProject(projectId, { ...project, tasks: [...project.tasks, newTask] });
+                updateProject(projectId, { tasks: [...project.tasks, newTask] });
                 setNewTaskInputs({...newTaskInputs, [projectId]: { text: '', dueDate: '', priority: 'medium' }});
             };
             
-            const toggleTask = (projectId, taskId) => {
+            const handleDetailChange = (projectId, field, value) => {
                 const project = projects.find(p => p.id === projectId);
+                const updatedDetails = { ...project.details, [field]: value };
+                updateProject(projectId, { details: updatedDetails });
+            };
+            
+            const exportData = () => {
+                const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+                    JSON.stringify(projects, null, 2)
+                )}`;
+                const link = document.createElement("a");
+                link.href = jsonString;
+                link.download = `basetask_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                link.click();
+                showNotification("Data exported successfully!", "success");
+            };
+            
+            const importData = (event) => {
+                const fileReader = new FileReader();
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = e => {
+                    try {
+                        const importedProjects = JSON.parse(e.target.result);
+                        // Basic validation
+                        if (Array.isArray(importedProjects)) {
+                            setProjects(importedProjects);
+                            showNotification("Data imported successfully!", "success");
+                        } else {
+                            throw new Error("Invalid file format");
+                        }
+                    } catch (error) {
+                        showNotification("Failed to import data. Invalid file.", "error");
+                    }
+                };
+            };
+
+            const sortedProjects = React.useMemo(() => {
+                const projectsCopy = [...projects];
+                switch (sortMethod) {
+                    case 'alphabetical':
+                        return projectsCopy.sort((a, b) => a.name.localeCompare(b.name));
+                    case 'progress':
+                        return projectsCopy.sort((a, b) => {
+                            const progressA = a.tasks.length > 0 ? (a.tasks.filter(t => t.completed).length / a.tasks.length) : 0;
+                            const progressB = b.tasks.length > 0 ? (b.tasks.filter(t => t.completed).length / b.tasks.length) : 0;
+                            return progressB - progressA;
+                        });
+                    case 'dateAdded':
+                    default:
+                        return projectsCopy.sort((a, b) => b.id - a.id);
+                }
+            }, [projects, sortMethod]);
+
+            return (
+                <div>
+                    <div className="controls-section">
+                        <form className="project-form" onSubmit={addProject}>
+                            <input type="text" placeholder="Add new project (e.g., Aerodrome Finance)" value={newProjectName} onChange={(e) => setNewProjectName(e.target.value)} />
+                            <button type="submit">
+                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Add Project
+                            </button>
+                        </form>
+                        <div className="sort-control">
+                             <select value={sortMethod} onChange={(e) => setSortMethod(e.target.value)}>
+                                <option value="dateAdded">Sort: Date Added</option>
+                                <option value="alphabetical">Sort: A-Z</option>
+                                <option value="progress">Sort: By Progress</option>
+                            </select>
+                        </div>
+                         <div className="header-actions">
+                            <input type="file" id="import-file" style={{ display: 'none' }} onChange={importData} accept=".json" />
+                            <button className="icon-button" onClick={() => document.getElementById('import-file').click()} title="Import Data">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            </button>
+                            <button className="icon-button" onClick={exportData} title="Export Data">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    {sortedProjects.length > 0 ? sortedProjects.map(project => (
+                        <ProjectCard 
+                            key={project.id} 
+                            project={project} 
+                            updateProject={updateProject}
+                            deleteProject={deleteProject}
+                            detailsVisible={detailsVisible}
+                            setDetailsVisible={setDetailsVisible}
+                            completedVisible={completedVisible}
+                            setCompletedVisible={setCompletedVisible}
+                            newTaskInputs={newTaskInputs}
+                            setNewTaskInputs={setNewTaskInputs}
+                        />
+                    )) : (
+                         <p style={{textAlign: 'center', color: 'var(--subtle-text-color)'}}>No projects yet. Add one to start tracking!</p>
+                    )}
+                </div>
+            );
+        }
+
+        function ProjectCard({ project, updateProject, deleteProject, detailsVisible, setDetailsVisible, completedVisible, setCompletedVisible, newTaskInputs, setNewTaskInputs }) {
+            const [editingTaskId, setEditingTaskId] = React.useState(null);
+            const [editingText, setEditingText] = React.useState('');
+
+            const incompleteTasks = project.tasks.filter(t => !t.completed);
+            const completedTasks = project.tasks.filter(t => t.completed);
+            const progress = project.tasks.length > 0 ? (completedTasks.length / project.tasks.length) * 100 : 0;
+            const isDetailsOpen = !!detailsVisible[project.id];
+            const isCompletedOpen = !!completedVisible[project.id];
+            
+            const handleTaskInputChange = (field, value) => {
+                 setNewTaskInputs(prev => ({...prev, [project.id]: { ...prev[project.id], [field]: value }}));
+            };
+
+            const handleDetailChange = (field, value) => {
+                const updatedDetails = { ...project.details, [field]: value };
+                updateProject(project.id, { details: updatedDetails });
+            };
+
+            const addTask = (e) => {
+                e.preventDefault();
+                const taskInput = newTaskInputs[project.id] || {};
+                const text = taskInput.text || '';
+                if (!text.trim()) return;
+
+                const newTask = { 
+                    id: Date.now(), text, 
+                    dueDate: taskInput.dueDate || '', priority: taskInput.priority || 'medium',
+                    completed: false 
+                };
+                
+                updateProject(project.id, { tasks: [...project.tasks, newTask] });
+                setNewTaskInputs({...newTaskInputs, [project.id]: { text: '', dueDate: '', priority: 'medium' }});
+            };
+
+             const toggleTask = (taskId) => {
                 const updatedTasks = project.tasks.map(t => 
                     t.id === taskId ? { ...t, completed: !t.completed } : t
                 );
-                updateProject(projectId, { ...project, tasks: updatedTasks });
+                updateProject(project.id, { tasks: updatedTasks });
             };
 
             const handleEdit = (task) => {
@@ -403,25 +575,13 @@
                 setEditingText(task.text);
             };
 
-            const saveEdit = (projectId, taskId) => {
-                const project = projects.find(p => p.id === projectId);
+            const saveEdit = (taskId) => {
                 const updatedTasks = project.tasks.map(t => 
                     t.id === taskId ? { ...t, text: editingText } : t
                 );
-                updateProject(projectId, { ...project, tasks: updatedTasks });
+                updateProject(project.id, { tasks: updatedTasks });
                 setEditingTaskId(null);
                 setEditingText('');
-            };
-
-            const handleTaskInputChange = (projectId, field, value) => {
-                 setNewTaskInputs(prev => ({
-                     ...prev,
-                     [projectId]: { ...prev[projectId], [field]: value }
-                 }));
-            };
-
-            const toggleCompletedVisibility = (projectId) => {
-                setCompletedVisible(prev => ({...prev, [projectId]: !prev[projectId]}));
             };
 
             const formatDate = (dateString) => {
@@ -442,31 +602,25 @@
                 return '';
             };
 
-            const PriorityTag = ({priority}) => (
-                <span className={`priority-tag ${priority}`}>{priority}</span>
-            );
+            const PriorityTag = ({priority}) => (<span className={`priority-tag ${priority}`}>{priority}</span>);
 
-            const TaskItem = ({ project, task }) => {
+            const TaskItem = ({ task }) => {
                 const isEditing = editingTaskId === task.id;
-
                 return (
                     <li className="task-item">
                         {isEditing ? (
-                            <form className="edit-task-form" onSubmit={(e) => { e.preventDefault(); saveEdit(project.id, task.id); }}>
-                                <input type="text" value={editingText} onChange={(e) => setEditingText(e.target.value)} autoFocus />
-                                <button type="submit">Save</button>
+                            <form className="edit-task-form" onSubmit={(e) => { e.preventDefault(); saveEdit(task.id); }}>
+                                <input type="text" value={editingText} onChange={(e) => setEditingText(e.target.value)} autoFocus onBlur={() => saveEdit(task.id)}/>
                             </form>
                         ) : (
                             <>
                                 <div className="task-item-main">
-                                    <input type="checkbox" id={`task-${task.id}`} checked={task.completed} onChange={() => toggleTask(project.id, task.id)} />
+                                    <input type="checkbox" id={`task-${task.id}`} checked={task.completed} onChange={() => toggleTask(task.id)} />
                                     <label htmlFor={`task-${task.id}`} className={task.completed ? 'completed' : ''}> {task.text} </label>
                                 </div>
                                 <div className="task-item-actions">
                                     <PriorityTag priority={task.priority} />
-                                    {task.dueDate && (
-                                        <span className={`task-due-date ${getDueDateClass(task)}`}> {formatDate(task.dueDate)} </span>
-                                    )}
+                                    {task.dueDate && <span className={`task-due-date ${getDueDateClass(task)}`}> {formatDate(task.dueDate)} </span>}
                                     <button className="action-button edit" onClick={() => handleEdit(task)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                                     </button>
@@ -478,69 +632,70 @@
             };
 
             return (
-                <div>
-                    <form className="project-form" onSubmit={addProject}>
-                        <input type="text" placeholder="Add new project (e.g., Aerodrome Finance)" value={newProjectName} onChange={(e) => setNewProjectName(e.target.value)} />
-                        <button type="submit">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                           Add Project
-                        </button>
-                    </form>
-
-                    {projects.length > 0 ? projects.map(project => {
-                        const incompleteTasks = project.tasks.filter(t => !t.completed);
-                        const completedTasks = project.tasks.filter(t => t.completed);
-                        const progress = project.tasks.length > 0 ? (completedTasks.length / project.tasks.length) * 100 : 0;
-                        const isCompletedOpen = !!completedVisible[project.id];
-
-                        return (
-                            <div key={project.id} className="project-card">
-                                <div className="project-header">
-                                    <h2>{project.name}</h2>
-                                    <button className="action-button delete" onClick={() => deleteProject(project.id)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                    </button>
-                                </div>
-                                {project.tasks.length > 0 && (
-                                    <div className="progress-info">
-                                        <div className="progress-text">{completedTasks.length} of {project.tasks.length} tasks completed</div>
-                                        <div className="progress-bar-container"><div className="progress-bar" style={{width: `${progress}%`}}></div></div>
-                                    </div>
-                                )}
-                                <ul className="task-list">
-                                    {incompleteTasks.map(task => (<TaskItem key={task.id} project={project} task={task} />))}
-                                </ul>
-                                <form className="task-form" onSubmit={(e) => { e.preventDefault(); addTask(project.id); }}>
-                                    <input type="text" placeholder="Add new task (e.g., Swap to increase volume)" value={(newTaskInputs[project.id] || {}).text || ''} onChange={(e) => handleTaskInputChange(project.id, 'text', e.target.value)} />
-                                    <input type="date" value={(newTaskInputs[project.id] || {}).dueDate || ''} onChange={(e) => handleTaskInputChange(project.id, 'dueDate', e.target.value)} />
-                                    <select value={(newTaskInputs[project.id] || {}).priority || 'medium'} onChange={(e) => handleTaskInputChange(project.id, 'priority', e.target.value)}>
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                    </select>
-                                    <button type="submit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                        Add
-                                    </button>
-                                </form>
-                                {completedTasks.length > 0 && (
-                                    <>
-                                        <button className={`completed-section-toggle ${isCompletedOpen ? 'open' : ''}`} onClick={() => toggleCompletedVisibility(project.id)}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                            {completedTasks.length} Completed Tasks
-                                        </button>
-                                        <div className={`completed-list ${isCompletedOpen ? 'open' : ''}`}>
-                                            <ul className="task-list">
-                                                {completedTasks.map(task => (<TaskItem key={task.id} project={project} task={task} />))}
-                                            </ul>
-                                        </div>
-                                    </>
-                                )}
+                 <div className="project-card">
+                    <div className="project-card-main">
+                        <div className="project-header">
+                            <h2>{project.name}</h2>
+                            <button className="action-button delete" onClick={() => deleteProject(project.id)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                        {project.tasks.length > 0 && (
+                            <div className="progress-info">
+                                <div className="progress-text">{completedTasks.length} of {project.tasks.length} tasks completed</div>
+                                <div className="progress-bar-container"><div className="progress-bar" style={{width: `${progress}%`}}></div></div>
                             </div>
-                        )
-                    }) : (
-                         <p style={{textAlign: 'center', color: 'var(--subtle-text-color)'}}>No projects yet. Add one to start tracking!</p>
-                    )}
+                        )}
+                        <ul className="task-list">
+                            {incompleteTasks.map(task => (<TaskItem key={task.id} task={task} />))}
+                        </ul>
+                        <form className="task-form" onSubmit={addTask}>
+                            <input type="text" placeholder="Add new task (e.g., Swap to increase volume)" value={(newTaskInputs[project.id] || {}).text || ''} onChange={(e) => handleTaskInputChange('text', e.target.value)} />
+                            <input type="date" value={(newTaskInputs[project.id] || {}).dueDate || ''} onChange={(e) => handleTaskInputChange('dueDate', e.target.value)} />
+                            <select value={(newTaskInputs[project.id] || {}).priority || 'medium'} onChange={(e) => handleTaskInputChange('priority', e.target.value)}>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                            <button type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Add
+                            </button>
+                        </form>
+                         {completedTasks.length > 0 && (
+                            <>
+                                <button className={`completed-section-toggle ${isCompletedOpen ? 'open' : ''}`} onClick={() => setCompletedVisible(prev => ({...prev, [project.id]: !prev[project.id]}))}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    {completedTasks.length} Completed Tasks
+                                </button>
+                                <div className={`completed-list ${isCompletedOpen ? 'open' : ''}`}>
+                                    <ul className="task-list">
+                                        {completedTasks.map(task => (<TaskItem key={task.id} task={task} />))}
+                                    </ul>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    <button className={`details-toggle ${isDetailsOpen ? 'open' : ''}`} onClick={() => setDetailsVisible(prev => ({...prev, [project.id]: !prev[project.id]}))}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        Details
+                    </button>
+                    <div className={`project-details ${isDetailsOpen ? 'open' : ''}`}>
+                        <div className="details-grid">
+                            <div>
+                                <label>Website</label>
+                                <input type="text" placeholder="https://project.com" value={project.details.website || ''} onChange={(e) => handleDetailChange('website', e.target.value)} />
+                            </div>
+                            <div>
+                                <label>Twitter</label>
+                                <input type="text" placeholder="https://twitter.com/project" value={project.details.twitter || ''} onChange={(e) => handleDetailChange('twitter', e.target.value)} />
+                            </div>
+                            <div style={{gridColumn: '1 / -1'}}>
+                                <label>Notes</label>
+                                <textarea placeholder="Your strategy, thoughts, next steps..." value={project.details.notes || ''} onChange={(e) => handleDetailChange('notes', e.target.value)}></textarea>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             );
         }
