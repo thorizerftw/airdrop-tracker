@@ -106,7 +106,8 @@
             transition: background-color 0.3s ease;
         }
         .connectButton:hover { background-color: #0045d1; }
-        .connectButton:disabled { background-color: #a0aec0; cursor: not-allowed; }
+        .connectButton.disconnect { background-color: var(--subtle-text-color); }
+        .connectButton.disconnect:hover { background-color: var(--danger-color); }
 
         .project-form {
             display: flex;
@@ -260,6 +261,11 @@
                     showNotification("Failed to connect wallet.", "error");
                 }
             };
+
+            const disconnectWallet = () => {
+                setUserAddress(null);
+                showNotification("Wallet Disconnected.", "success");
+            };
             
             return (
                 <div className="app-container">
@@ -269,12 +275,11 @@
                         </div>
                         <div className="header-actions">
                             <button 
-                                className="connectButton"
-                                onClick={connectWallet} 
-                                disabled={!!userAddress}
+                                className={`connectButton ${userAddress ? 'disconnect' : ''}`}
+                                onClick={userAddress ? disconnectWallet : connectWallet} 
                             >
                                 {userAddress 
-                                    ? `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`
+                                    ? "Disconnect"
                                     : "Connect Wallet"}
                             </button>
                             <button className="theme-toggle-button" onClick={toggleTheme} aria-label="Toggle theme">
@@ -411,7 +416,7 @@
                     <form className="project-form" onSubmit={addProject}>
                         <input 
                             type="text" 
-                            placeholder="Add new project (e.g., LayerZero)"
+                            placeholder="Add new project (e.g., Aerodrome Finance)"
                             value={newProjectName}
                             onChange={(e) => setNewProjectName(e.target.value)}
                         />
@@ -458,7 +463,7 @@
                                             </div>
                                             {task.dueDate && (
                                                 <span className={`task-due-date ${getDueDateClass(task)}`}>
-                                                    {new Date(task.dueDate).toLocaleDateString()}
+                                                    {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                 </span>
                                             )}
                                         </li>
@@ -467,7 +472,7 @@
                                 <form className="task-form" onSubmit={(e) => { e.preventDefault(); addTask(project.id); }}>
                                     <input 
                                         type="text" 
-                                        placeholder="Add new task..."
+                                        placeholder="Add new task (e.g., Swap to increase volume)"
                                         value={(newTaskInputs[project.id] || {}).text || ''}
                                         onChange={(e) => handleTaskInputChange(project.id, 'text', e.target.value)}
                                     />
