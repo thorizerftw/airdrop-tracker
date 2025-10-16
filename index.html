@@ -251,7 +251,18 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
+        // --- Base Mini-App Hook (as per docs) ---
+        const useMiniApp = () => {
+            React.useEffect(() => {
+                if (window.parent !== window) {
+                    window.parent.postMessage({ type: 'mini-app-loaded' }, '*');
+                }
+            }, []);
+        };
+
         function App() {
+            useMiniApp(); 
+
             const [user, setUser] = React.useState(null);
             const [notification, setNotification] = React.useState({ message: '', type: '' });
             const [theme, setTheme] = React.useState(() => localStorage.getItem('theme') || 'light');
@@ -313,7 +324,11 @@
             };
             
             const handleFarcasterConnect = () => {
-                window.parent.postMessage({ type: 'farcasterUserRequest' }, '*');
+                if (window.parent !== window) {
+                    window.parent.postMessage({ type: 'farcasterUserRequest' }, '*');
+                } else {
+                    showNotification("Farcaster sign-in only works inside a mini-app environment like Coinbase Wallet.", "error");
+                }
             };
 
             const disconnectWallet = async () => {
@@ -385,7 +400,7 @@
                             <span>MetaMask</span>
                         </button>
                          <button className="wallet-button" onClick={() => onConnect('coinbase')}>
-                            <svg width="32" height="32" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M512 1024C795.833 1024 1024 795.833 1024 512C1024 228.167 795.833 0 512 0C228.167 0 0 228.167 0 512C0 795.833 228.167 1024 512 1024ZM448 320H320V448H128V320H0C0 143.267 143.267 0 320 0V128H448V320ZM576 704H704V576H896V704H1024C1024 880.733 880.733 1024 704 1024V896H576V704ZM704 448V320H896C896 205.9 813.433 128 704 128V0C880.733 0 1024 143.267 1024 320V448H704ZM320 576V704H128C128 818.1 209.767 896 320 896V1024C143.267 1024 0 880.733 0 704V576H320Z" fill="#0052FF"/></svg>
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M16 32C24.8366 32 32 24.8366 32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16C0 24.8366 7.16344 32 16 32ZM14 10H10V14H4V10H0C0 4.47715 4.47715 0 10 0V4H14V10ZM18 22H22V18H28V22H32C32 27.5228 27.5228 32 22 32V28H18V22ZM22 14V10H28C28 6.68629 25.3137 4 22 4V0C27.5228 0 32 4.47715 32 10V14H22ZM10 18V22H4C4 25.3137 6.68629 28 10 28V32C4.47715 32 0 27.5228 0 22V18H10Z" fill="#0052FF"/></svg>
                             <span>Coinbase Wallet</span>
                         </button>
                         <button className="wallet-button" onClick={() => alert('Rabby Wallet support coming soon!')}>
@@ -393,7 +408,7 @@
                             <span>Rabby Wallet</span>
                         </button>
                         <button className="wallet-button" onClick={onFarcasterConnect}>
-                            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" rx="20" fill="#8A63D2"></rect><path d="M26.25 10.75H13.75C12.925 10.75 12.25 11.425 12.25 12.25V27.75C12.25 28.575 12.925 29.25 13.75 29.25H26.25C27.075 29.25 27.75 28.575 27.75 27.75V12.25C27.75 11.425 27.075 10.75 26.25 10.75Z" stroke="white" strokeWidth="2.5"></path><path d="M26.25 14V13.75C26.25 12.925 25.575 12.25 24.75 12.25H15.25C14.425 12.25 13.75 12.925 13.75 13.75V26.25C13.75 27.075 14.425 27.75 15.25 27.75H24.75C25.575 27.75 26.25 27.075 26.25 26.25V14Z" fill="white"></path></svg>
+                            <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" rx="20" fill="#8A63D2"></rect><path d="M26.25 10.75H13.75C12.925 10.75 12.25 11.425 12.25 12.25V27.75C12.25 28.575 12.925 29.25 13.75 29.25H26.25C27.075 29.25 27.75 28.575 27.75 27.75V12.25C27.75 11.425 27.075 10.75 26.25 10.75Z" stroke="white" strokeWidth="2.5"></path><path d="M26.25 14V13.75C26.25 12.925 25.575 12.25 24.75 12.25H15.25C14.425 12.25 13.75 12.925 13.75 13.75V26.25C13.75 27.075 14.425 27.75 15.25 27.75H24.75C25.575 27.75 26.25 27.075 26.25 26.25V14Z" fill="white"></path></svg>
                             <span>Sign in with Farcaster</span>
                         </button>
                     </div>
