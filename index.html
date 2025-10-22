@@ -253,9 +253,17 @@
     <script type="text/babel">
         // --- Base Mini-App Hook (as per docs) ---
         const useMiniApp = () => {
+            const ACCOUNT_ASSOCIATION = "YOUR_ACCOUNT_ASSOCIATION_STRING_HERE";
+
             React.useEffect(() => {
                 if (window.parent !== window) {
                     window.parent.postMessage({ type: 'mini-app-loaded' }, '*');
+                    if (ACCOUNT_ASSOCIATION && ACCOUNT_ASSOCIATION.startsWith('did:pkh')) {
+                        window.parent.postMessage({
+                            type: 'mini-app-account-association',
+                            accountAssociation: ACCOUNT_ASSOCIATION
+                        }, '*');
+                    }
                 }
             }, []);
         };
@@ -434,7 +442,6 @@
                 localStorage.setItem(getStorageKey('farm-tracker'), JSON.stringify(projects));
             }, [projects, getStorageKey]);
             
-            // Notification logic...
             React.useEffect(() => {
                  if (Notification.permission !== "granted") return;
                 const today = new Date().toISOString().slice(0, 10);
@@ -458,7 +465,7 @@
                     new Notification(`Tasks Due Today!`, { body, icon: "https://placehold.co/192x192/0052ff/FFFFFF?text=B" });
                     localStorage.setItem(sentNotificationsKey, JSON.stringify(sentNotifications));
                 }
-            }, [projects, getStorageKey]);
+            }, []); // Run only once on initial load
 
             const addProject = (e) => {
                 e.preventDefault();
